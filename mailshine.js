@@ -26,6 +26,10 @@ module.exports.addReplyDetector = function(regex) {
 	Regex.replyDetectors.push(regex);
 };
 
+module.exports.addHTMLCleaner = function (){
+
+};
+
 function cleanHTML(html) {
 	Regex.htmlCleaners.forEach(function(regex) {
 		html = html.replace(regex, '');
