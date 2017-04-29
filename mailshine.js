@@ -2,12 +2,16 @@ var Regex = require('./lib/regex.js'),
 	toMarkdown = require('to-markdown'),
 	marked = require('marked');
 
-module.exports.clean = function(html) {
+function MailShine() {
+	this.regex = Regex.prototype;
+}
+
+MailShine.prototype.clean = function(html) {
 	var output = {
 		html: '',
-		md:'',
-		reply:{
-			html:'',
+		md: '',
+		reply: {
+			html: '',
 			md: ''
 		}
 	};
@@ -16,31 +20,53 @@ module.exports.clean = function(html) {
 		throw 'The email message to be parsed must be a HTML string.';
 	}
 
+	output.html = this.cleanHTML(html);
+
 	return output;
 };
 
-module.exports.addReplyDetector = function(regex) {
+MailShine.prototype.add = function(regex, type) {
+	var regexLibrary;
+
 	if (!(regex instanceof RegExp)) {
-		throw 'A reply detector must be a regex.';
+		throw 'Must provide a Regex.';
 	}
-	Regex.replyDetectors.push(regex);
+
+	regexLibrary = (type === 'replyDetector') ? this.regex.replyDetectors : this.regex.htmlCleaners;
+
+	regexLibrary.push(regex);
 };
 
-module.exports.addHTMLCleaner = function (){
+MailShine.prototype.remove = function(regex, type) {
+	var index,
+		regexLibrary;
 
+	if (!(regex instanceof RegExp)) {
+		throw 'Must provide a Regex.';
+	}
+
+	regexLibrary = (type === 'replyDetector') ? this.regex.replyDetectors : this.regex.htmlCleaners;
+
+	index = regexLibrary.findIndex(function(el) {
+		return (el.toString() === regex.toString());
+	});
+
+	if (index > -1) regexLibrary.splice(index, 1);
 };
 
-function cleanHTML(html) {
-	Regex.htmlCleaners.forEach(function(regex) {
+MailShine.prototype.cleanHTML = function(html) {
+	this.regex.htmlCleaners.forEach(function(regex) {
 		html = html.replace(regex, '');
 	});
 	return html;
-}
+};
 
-function convertToMarkdown (html){
+MailShine.prototype.convertToMarkdown = function(html) {
 	return toMarkdown(html);
-}
+};
 
-function convertToHTML (markdown){
+MailShine.prototype.convertToHTML = function(markdown) {
 	return marked(markdown);
-}
+};
+
+module.exports = MailShine;
