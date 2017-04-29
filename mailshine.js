@@ -12,3 +12,7 @@ module.exports.addReplyDetector = function(regex){
     }
     Regex.replyDetectors.push(regex);
 };
+
+function cleanHTML(){
+
+}

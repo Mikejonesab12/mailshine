@@ -4,7 +4,8 @@
   "description": "A simple and lightweight library that cleans html email content for use in other environments like webpages.",
   "main": "mailshine.js",
   "dependencies": {
-    "express": "^4.13.3"
+    "to-markdown":"3.0.4",
+    "marked": "0.3.6"
   },
   "engines": {
     "node": "4.0.0"
