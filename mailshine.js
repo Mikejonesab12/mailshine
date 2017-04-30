@@ -11,11 +11,11 @@ function MailShine(options) {
 	if (options.removeHTMLCleaners) this.removeMany(options.removeHTMLCleaners, 'htmlCleaner');
 }
 
-MailShine.prototype.clean = function(html) {
+MailShine.prototype.parseHTML = function(html) {
 	var output = {},
 		cleanedHtml,
 		convertedMarkdown,
-		parsedContent;
+		parsedMarkdown;
 
 	if (!(html instanceof String)) {
 		throw 'The email message to be parsed must be a HTML string.';
@@ -23,19 +23,25 @@ MailShine.prototype.clean = function(html) {
 
 	cleanedHtml = this.cleanHTML(html);
 	convertedMarkdown = this.convertToMarkdown(cleanedHtml);
-	parsedContent = this.parse(convertedMarkdown);
+	parsedMarkdown = this.parseText(convertedMarkdown);
+
+	output.markdownContent = parsedMarkdown.content;
+	output.markdownQuote = parsedMarkdown.quote;
+	output.htmlContent = marked(output.markdownContent);
+	output.htmlQuote = marked(output.markdownQuote);
 
 	return output;
 };
 
-MailShine.prototype.parse = function(text) {
+MailShine.prototype.parseText = function(text) {
 	var self = this;
 
 	var nlRegex = /\r?\n/,
+		parsedText = {},
 		lineArray,
 		cutPoint;
 
-	lineArray = text.splot(nlRegex);
+	lineArray = text.split(nlRegex);
 
 	cutPoint = lineArray.findIndex(function(line) {
 		return self.replyDetectors.some(function(regex) {
@@ -43,13 +49,13 @@ MailShine.prototype.parse = function(text) {
 		});
 	});
 
-	lineArray.length = cutPoint;
+	parsedText.quote = lineArray.splice(cutPoint);
+	parsedText.content = lineArray;
 
-	return this.cleanText(lineArray.join('\n'));
-};
+	parsedText.content = parsedText.content.join('\n').trim();
+	parsedText.quote = parsedText.quote.join('\n').trim();
 
-MailShine.prototype.cleanText = function() {
-
+	return parsedText;
 };
 
 MailShine.prototype.add = function(regex, type) {
