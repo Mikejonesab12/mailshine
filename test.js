@@ -4,10 +4,11 @@ var MailShine = require('./mailshine.js'),
     testHtml,
     testText;
 
-    testHtml = "<p>cool content</p>\
+    testHtml = '<p class = "test">cool content</p>\
+    <h1>test title</h1>\
     <p>More content.</p>\
     <blockquote>---original message---\
-    <p>this is a quote.</p></blockquote>";
+    <p>this is a quote.</p></blockquote>';
 
     mailshine = new MailShine();
 

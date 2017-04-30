@@ -17,7 +17,7 @@ MailShine.prototype.parseHTML = function(html) {
 		convertedMarkdown,
 		parsedMarkdown;
 
-	if (!(html instanceof String)) {
+	if (typeof html !== 'string') {
 		throw 'The email message to be parsed must be a HTML string.';
 	}
 
@@ -104,7 +104,7 @@ MailShine.prototype.removeMany = function(list, type) {
 };
 
 MailShine.prototype.cleanHTML = function(html) {
-	this.regex.htmlCleaners.forEach(function(regex) {
+	this.htmlCleaners.forEach(function(regex) {
 		html = html.replace(regex, '');
 	});
 	return html;
