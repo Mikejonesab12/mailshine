@@ -28,8 +28,28 @@ MailShine.prototype.clean = function(html) {
 	return output;
 };
 
-MailShine.prototype.parse = function (markdown){
-	
+MailShine.prototype.parse = function(text) {
+	var self = this;
+
+	var nlRegex = /\r?\n/,
+		lineArray,
+		cutPoint;
+
+	lineArray = text.splot(nlRegex);
+
+	cutPoint = lineArray.findIndex(function(line) {
+		return self.replyDetectors.some(function(regex) {
+			return regex.test(line);
+		});
+	});
+
+	lineArray.length = cutPoint;
+
+	return this.cleanText(lineArray.join('\n'));
+};
+
+MailShine.prototype.cleanText = function() {
+
 };
 
 MailShine.prototype.add = function(regex, type) {
@@ -45,8 +65,10 @@ MailShine.prototype.add = function(regex, type) {
 };
 
 MailShine.prototype.addMany = function(list, type) {
+	var self = this;
+
 	list.forEach(function(regex) {
-		this.add(regex, type);
+		self.add(regex, type);
 	});
 };
 
@@ -68,6 +90,8 @@ MailShine.prototype.remove = function(regex, type) {
 };
 
 MailShine.prototype.removeMany = function(list, type) {
+	var self = this;
+
 	list.forEach(function(regex) {
 		this.remove(regex, type);
 	});
