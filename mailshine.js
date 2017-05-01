@@ -1,5 +1,6 @@
 var Regex = require('./lib/regex.js'),
 	toMarkdown = require('to-markdown'),
+	fs = require('fs'),
 	marked = require('marked');
 
 function MailShine(options) {
@@ -43,7 +44,7 @@ MailShine.prototype.parseText = function(text) {
 
 	lineArray = text.split(nlRegex);
 
-	cutPoint = lineArray.findIndex(function(line) {
+	cutPoint = lineArray.findIndex(function(line, index) {
 		return self.replyDetectors.some(function(regex) {
 			return regex.test(line);
 		});
