@@ -1,20 +1,16 @@
 var Regex = require('./lib/regex.js'),
-	toMarkdown = require('to-markdown'),
 	fs = require('fs'),
+	Remarked = require('remarked.js'),
 	marked = require('marked');
 
 function MailShine(options) {
 	if (!options) return;
-
 	if (options.addReplyDetectors) this.addMany(options.addReplyDetectors, 'replyDetector');
-	if (options.addHTMLCleaners) this.addMany(options.addHTMLCleaners, 'htmlCleaner');
 	if (options.removeReplyDetectors) this.removeMany(options.removeReplyDetectors, 'replyDetector');
-	if (options.removeHTMLCleaners) this.removeMany(options.removeHTMLCleaners, 'htmlCleaner');
 }
 
 MailShine.prototype.parseHTML = function(html) {
 	var output = {},
-		cleanedHtml,
 		convertedMarkdown,
 		parsedMarkdown;
 
@@ -22,8 +18,7 @@ MailShine.prototype.parseHTML = function(html) {
 		throw 'The email message to be parsed must be a HTML string.';
 	}
 
-	cleanedHtml = this.cleanHTML(html);
-	convertedMarkdown = this.convertToMarkdown(cleanedHtml);
+	convertedMarkdown = new Remarked(html).markdown;
 	parsedMarkdown = this.parseText(convertedMarkdown);
 
 	output.markdownContent = parsedMarkdown.content;
@@ -102,21 +97,6 @@ MailShine.prototype.removeMany = function(list, type) {
 	list.forEach(function(regex) {
 		this.remove(regex, type);
 	});
-};
-
-MailShine.prototype.cleanHTML = function(html) {
-	this.htmlCleaners.forEach(function(regex) {
-		html = html.replace(regex, '');
-	});
-	return html;
-};
-
-MailShine.prototype.convertToMarkdown = function(html) {
-	return toMarkdown(html);
-};
-
-MailShine.prototype.convertToHTML = function(markdown) {
-	return marked(markdown);
 };
 
 //Include methods and properties from separate files.

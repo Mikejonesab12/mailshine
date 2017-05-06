@@ -1,25 +1,25 @@
 {
-  "name": "mailshine",
-  "version": "0.0.1",
-  "description": "A simple and lightweight library that cleans html email content for use in other environments like webpages.",
-  "main": "mailshine.js",
-  "dependencies": {
-    "to-markdown":"3.0.4",
-    "marked": "0.3.6"
-  },
-  "engines": {
-    "node": "4.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Mikejonesab12/mailshine"
-  },
-  "keywords": [
-	  "email",
-	  "quote",
-	  "reply",
-	  "parse"
-  ],
-  "author": "Michael Jones <mikejonesab12@gmail.com>",
-  "license": "GNU General Public License v3.0"
+    "name": "mailshine",
+    "version": "0.0.1",
+    "description": "A simple and lightweight library that cleans html email content for use in other environments like webpages.",
+    "main": "mailshine.js",
+    "dependencies": {
+		"remarked.js": "0.0.1",
+        "marked": "0.3.6"
+    },
+    "engines": {
+        "node": "4.0.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Mikejonesab12/mailshine"
+    },
+    "keywords": [
+        "email",
+        "quote",
+        "reply",
+        "parse"
+    ],
+    "author": "Michael Jones <mikejonesab12@gmail.com>",
+    "license": "GPL-3.0"
 }
