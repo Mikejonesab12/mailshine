@@ -5,8 +5,8 @@ var Regex = require('./lib/regex.js'),
 
 function MailShine(options) {
 	if (!options) return;
-	if (options.addReplyDetectors) this.addMany(options.addReplyDetectors, 'replyDetector');
-	if (options.removeReplyDetectors) this.removeMany(options.removeReplyDetectors, 'replyDetector');
+	if (options.add) this.addMany(options.add);
+	if (options.remove) this.removeMany(options.remove);
 }
 
 MailShine.prototype.parseHTML = function(html) {
@@ -45,7 +45,7 @@ MailShine.prototype.parseText = function(text) {
 		});
 	});
 
-	parsedText.quote = lineArray.splice(cutPoint);
+	parsedText.quote = (cutPoint === -1) ?  [] : lineArray.splice(cutPoint);
 	parsedText.content = lineArray;
 
 	parsedText.content = parsedText.content.join('\n').trim();
@@ -54,48 +54,41 @@ MailShine.prototype.parseText = function(text) {
 	return parsedText;
 };
 
-MailShine.prototype.add = function(regex, type) {
-	var regexLibrary;
-
+MailShine.prototype.add = function(regex) {
 	if (!(regex instanceof RegExp)) {
 		throw 'Must provide a Regex.';
 	}
 
-	regexLibrary = (type === 'replyDetector') ? this.regex.replyDetectors : this.regex.htmlCleaners;
-
-	regexLibrary.push(regex);
+	this.replyDetectors.push(regex);
 };
 
 MailShine.prototype.addMany = function(list, type) {
 	var self = this;
 
 	list.forEach(function(regex) {
-		self.add(regex, type);
+		self.add(regex);
 	});
 };
 
 MailShine.prototype.remove = function(regex, type) {
-	var index,
-		regexLibrary;
+	var index;
 
 	if (!(regex instanceof RegExp)) {
 		throw 'Must provide a Regex.';
 	}
 
-	regexLibrary = (type === 'replyDetector') ? this.regex.replyDetectors : this.regex.htmlCleaners;
-
-	index = regexLibrary.findIndex(function(el) {
+	index = this.replyDetectors.findIndex(function(el) {
 		return (el.toString() === regex.toString());
 	});
 
-	if (index > -1) regexLibrary.splice(index, 1);
+	if (index > -1) this.replyDetectors.splice(index, 1);
 };
 
-MailShine.prototype.removeMany = function(list, type) {
+MailShine.prototype.removeMany = function(list) {
 	var self = this;
 
 	list.forEach(function(regex) {
-		this.remove(regex, type);
+		self.remove(regex);
 	});
 };
 
