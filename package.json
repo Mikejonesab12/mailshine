@@ -1,6 +1,6 @@
 {
     "name": "mailshine",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "description": "A simple and lightweight library that cleans html email content for use in other environments like webpages.",
     "main": "mailshine.js",
     "dependencies": {
@@ -12,7 +12,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/Mikejonesab12/mailshine"
+        "url": "https://github.com/Mikejonesab12/mailshine.js"
     },
     "keywords": [
         "email",
