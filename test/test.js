@@ -6,14 +6,10 @@ var MailShine = require('../mailshine.js'),
 	testText;
 
 
-mailshine = new MailShine({
-	add:[/\\>.*?[q]\>/g],
-	remove:['sdfsd']
-});
+mailshine = new MailShine();
 
-console.log(mailshine.replyDetectors);
 testHtml = fs.readFileSync('./test.html', 'utf8');
 output = mailshine.parseHTML(testHtml);
-
+console.log(output);
 fs.writeFileSync('./test_content.txt', output.htmlContent, 'utf8');
 fs.writeFileSync('./test_quote.txt', output.htmlQuote, 'utf8');
