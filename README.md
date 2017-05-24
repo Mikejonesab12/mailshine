@@ -63,5 +63,5 @@ output = mailshine.parseHTML(html);
 
 ```
 ## About
-Version 1.0.0
+Version 1.0.3
 Last Updated 5/7/2017
