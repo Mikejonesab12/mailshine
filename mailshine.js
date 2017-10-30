@@ -1,6 +1,6 @@
-var Regex = require('./lib/regex.js'),
+var patterns = require('./lib/regex.js'),
 	fs = require('fs'),
-	Remarked = require('remarked.js'),
+	Unmark = require('unmark'),
 	marked = require('marked');
 
 function MailShine(options) {
@@ -10,16 +10,16 @@ function MailShine(options) {
 }
 
 MailShine.prototype.parseHTML = function(html) {
-	var output = {},
-		convertedMarkdown,
-		parsedMarkdown;
 
 	if (typeof html !== 'string') {
 		throw 'The email message to be parsed must be a HTML string.';
 	}
 
-	convertedMarkdown = new Remarked(html).markdown;
-	parsedMarkdown = this.parseText(convertedMarkdown);
+	var convertedMarkdown = new Unmark(html).markdown;
+	console.log(convertedMarkdown);
+	var parsedMarkdown = this.parseText(convertedMarkdown);
+
+	var output = {};
 
 	output.markdownContent = parsedMarkdown.content;
 	output.markdownQuote = parsedMarkdown.quote;
@@ -32,24 +32,19 @@ MailShine.prototype.parseHTML = function(html) {
 MailShine.prototype.parseText = function(text) {
 	var self = this;
 
-	var nlRegex = /\r?\n/,
-		parsedText = {},
-		lineArray,
-		cutPoint;
+	var lineArray = text.split(/\r?\n/);
 
-	lineArray = text.split(nlRegex);
-
-	cutPoint = lineArray.findIndex(function(line, index) {
+	var cutPoint = lineArray.findIndex(function(line, index) {
+		var testText = lineArray.slice(index).join('\n').trim();
 		return self.replyDetectors.some(function(regex) {
-			return regex.test(line);
+			return regex.test(testText);
 		});
 	});
 
-	parsedText.quote = (cutPoint === -1) ?  [] : lineArray.splice(cutPoint);
-	parsedText.content = lineArray;
-
-	parsedText.content = parsedText.content.join('\n').trim();
-	parsedText.quote = parsedText.quote.join('\n').trim();
+	var parsedText = {};
+	console.log(cutPoint);
+	parsedText.quote = ((cutPoint === -1) ?  [] : lineArray.splice(cutPoint)).join('\n').trim();
+	parsedText.content = lineArray.join('\n').trim();
 
 	return parsedText;
 };
@@ -71,13 +66,11 @@ MailShine.prototype.addMany = function(list, type) {
 };
 
 MailShine.prototype.remove = function(regex, type) {
-	var index;
-
 	if (!(regex instanceof RegExp)) {
 		throw 'Must provide a Regex.';
 	}
 
-	index = this.replyDetectors.findIndex(function(el) {
+	var index = this.replyDetectors.findIndex(function(el) {
 		return (el.toString() === regex.toString());
 	});
 
@@ -92,7 +85,6 @@ MailShine.prototype.removeMany = function(list) {
 	});
 };
 
-//Include methods and properties from separate files.
-Regex(MailShine);
+MailShine.prototype.replyDetectors = patterns;
 
 module.exports = MailShine;

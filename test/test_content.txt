@@ -1,6 +1,2 @@
 <p>Great! how are you</p>
 <hr>
-<p>From: michael@brijjer.com <a href="mailto:michael@brij&#106;er\.com\">michael@brijjer\.;com\</a> Sent: Monday\, May 8\, 2017 6:21:33 AMTo: mikejonesab1@outlook.comSubject: brijjer test for Mike</p>
-<p>test</p>
-<p>Sent from <a href="https://brijjer.com/">Brijjer</a>  </p>
-<p>--</p>
