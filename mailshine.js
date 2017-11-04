@@ -16,7 +16,6 @@ MailShine.prototype.parseHTML = function(html) {
 	}
 
 	var convertedMarkdown = new Unmark(html).markdown;
-	console.log(convertedMarkdown);
 	var parsedMarkdown = this.parseText(convertedMarkdown);
 
 	var output = {};
@@ -42,7 +41,7 @@ MailShine.prototype.parseText = function(text) {
 	});
 
 	var parsedText = {};
-	console.log(cutPoint);
+	
 	parsedText.quote = ((cutPoint === -1) ?  [] : lineArray.splice(cutPoint)).join('\n').trim();
 	parsedText.content = lineArray.join('\n').trim();
 
