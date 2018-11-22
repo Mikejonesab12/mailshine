@@ -13,19 +13,19 @@ const removePatterns = (currentPatterns, newPatterns) => {
 
 const addPatterns = (currentPatterns, newPatterns) => [...currentPatterns, ...newPatterns];
 
-const MailShine = (htmlString, options) => {
-    let updatedPatterns;
-	
-    if (options.adds) {
-        updatedPatterns = addPatterns(patterns, options.adds)
-    }
-	
-    if (options.remove) {
-        updatedPatterns = removePatterns(options.remove);
-    }
-	
-    return parseHTML(htmlString, updatedPatterns);
-}
+const parseMarkdown = (text, patterns) => {
+    const lineArray = text.split(/\r?\n/);
+
+    const cutPoint = lineArray.findIndex((line, index) => {
+        const testText = lineArray.slice(index).join('\n').trim(); // We want all the remaining text starting at this line.
+        return patterns.some((pattern) => pattern.test(testText));
+    });
+
+    return {
+        quote: ((cutPoint === -1) ?  [] : lineArray.slice(cutPoint)).join('\n').trim(),
+        content: lineArray.slice(0, cutPoint).join('\n').trim()
+    };
+};
 
 const parseHTML = function(html, patterns) {
     const convertedMarkdown = Unmark(html);
@@ -39,20 +39,18 @@ const parseHTML = function(html, patterns) {
     };
 };
 
-const parseMarkdown = (text, patterns) => {
-    const lineArray = text.split(/\r?\n/);
-
-    const cutPoint = lineArray.findIndex((line, index) => {
-        const testText = lineArray.slice(index).join('\n').trim(); // We want all the text starting at this line.
-        return patterns.some((pattern) => pattern.test(testText));
-    });
-
-    var parsedText = {};
+const MailShine = (htmlString, options) => {
+    let updatedPatterns = patterns;
 	
-    parsedText.quote = ((cutPoint === -1) ?  [] : lineArray.splice(cutPoint)).join('\n').trim();
-    parsedText.content = lineArray.join('\n').trim();
-
-    return parsedText;
-};
+    if (options && options.adds) {
+        updatedPatterns = addPatterns(patterns, options.adds)
+    }
+	
+    if (options && options.removes) {
+        updatedPatterns = removePatterns(patterns, options.removes);
+    }
+    
+    return parseHTML(htmlString, updatedPatterns);
+}
 
 module.exports = MailShine;

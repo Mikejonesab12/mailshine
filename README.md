@@ -36,22 +36,16 @@ Install via console:  `npm install mailshine`
 ## Usage
 
 ```javascript
-var Mailshine = require('mailshine'),
-    mailshine,
-    output,
-    html;
+const Mailshine = require('mailshine');
+
+const adds = [/reply:/g];
+const removes = [/\\>.*?[\s]\>/g];
 
 html = "<p>Hi Warren! Tennis this weekend?</p><div>To: mikejonesab12@gmail, From: Warren Buffet</div><p>Hey, it's your pal Warren :)</p>";
 
-//Instantiate. Add and remove patterns.
-mailshine = new Mailshine({
-    add:[/reply:/g],
-    remove:[/\\>.*?[\s]\>/g]
-});
 
-//Tip: console.log(mailshine.replyDetectors) to see what patterns will be used.
-
-output = mailshine.parseHTML(html);
+let output = Mailshine(html); // without any custom adds or removes.
+output = Mailshine(html, {adds, removes}); // without any custom adds or removes.
 
 //Output:
 {
