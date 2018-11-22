@@ -1,14 +1,14 @@
 {
     "name": "mailshine",
-    "version": "1.0.5",
+    "version": "2.0.0",
     "description": "A simple and lightweight library that cleans html email content for use in other environments like webpages.",
     "main": "mailshine.js",
     "dependencies": {
-        "marked": "0.3.6",
-        "unmark": "^1.0.1"
+        "marked": "0.5.2",
+        "unmark": "2.0.0"
     },
     "engines": {
-        "node": "4.0.0"
+        "node": ">=8.0.0"
     },
     "repository": {
         "type": "git",

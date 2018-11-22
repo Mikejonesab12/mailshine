@@ -1,89 +1,58 @@
-var patterns = require('./lib/regex.js'),
-	fs = require('fs'),
-	Unmark = require('unmark'),
-	marked = require('marked');
+const patterns = require('./lib/patterns.js');
+const Unmark = require('unmark');
+const marked = require('marked');
 
-function MailShine(options) {
-	if (!options) return;
-	if (options.add) this.addMany(options.add);
-	if (options.remove) this.removeMany(options.remove);
+const removePatterns = (currentPatterns, newPatterns) => {
+    newPatterns.forEach(newPattern => {
+        const index = currentPatterns.findIndex(pattern => (pattern.toString() === newPattern.toString()));
+        if (index > -1) currentPatterns.splice(index, 1);
+    });
+	
+    return currentPatterns;
 }
 
-MailShine.prototype.parseHTML = function(html) {
+const addPatterns = (currentPatterns, newPatterns) => [...currentPatterns, ...newPatterns];
 
-	if (typeof html !== 'string') {
-		throw 'The email message to be parsed must be a HTML string.';
-	}
-
-	var convertedMarkdown = new Unmark(html).markdown;
-	var parsedMarkdown = this.parseText(convertedMarkdown);
-
-	var output = {};
-
-	output.markdownContent = parsedMarkdown.content;
-	output.markdownQuote = parsedMarkdown.quote;
-	output.htmlContent = marked(output.markdownContent);
-	output.htmlQuote = marked(output.markdownQuote);
-
-	return output;
-};
-
-MailShine.prototype.parseText = function(text) {
-	var self = this;
-
-	var lineArray = text.split(/\r?\n/);
-
-	var cutPoint = lineArray.findIndex(function(line, index) {
-		var testText = lineArray.slice(index).join('\n').trim();
-		return self.replyDetectors.some(function(regex) {
-			return regex.test(testText);
-		});
-	});
-
-	var parsedText = {};
+const MailShine = (htmlString, options) => {
+    let updatedPatterns;
 	
-	parsedText.quote = ((cutPoint === -1) ?  [] : lineArray.splice(cutPoint)).join('\n').trim();
-	parsedText.content = lineArray.join('\n').trim();
+    if (options.adds) {
+        updatedPatterns = addPatterns(patterns, options.adds)
+    }
+	
+    if (options.remove) {
+        updatedPatterns = removePatterns(options.remove);
+    }
+	
+    return parseHTML(htmlString, updatedPatterns);
+}
 
-	return parsedText;
+const parseHTML = function(html, patterns) {
+    const convertedMarkdown = Unmark(html);
+    const parsedMarkdown = parseMarkdown(convertedMarkdown, patterns);
+	
+    return {
+        markdownContent: parsedMarkdown.content,
+        markdownQuote: parsedMarkdown.quote,
+        htmlContent: marked(parsedMarkdown.content),
+        htmlQuote: marked(parsedMarkdown.quote)
+    };
 };
 
-MailShine.prototype.add = function(regex) {
-	if (!(regex instanceof RegExp)) {
-		throw 'Must provide a Regex.';
-	}
+const parseMarkdown = (text, patterns) => {
+    const lineArray = text.split(/\r?\n/);
 
-	this.replyDetectors.push(regex);
+    const cutPoint = lineArray.findIndex((line, index) => {
+        const testText = lineArray.slice(index).join('\n').trim(); // We want all the text starting at this line.
+        return patterns.some((pattern) => pattern.test(testText));
+    });
+
+    var parsedText = {};
+	
+    parsedText.quote = ((cutPoint === -1) ?  [] : lineArray.splice(cutPoint)).join('\n').trim();
+    parsedText.content = lineArray.join('\n').trim();
+
+    return parsedText;
 };
-
-MailShine.prototype.addMany = function(list, type) {
-	var self = this;
-
-	list.forEach(function(regex) {
-		self.add(regex);
-	});
-};
-
-MailShine.prototype.remove = function(regex, type) {
-	if (!(regex instanceof RegExp)) {
-		throw 'Must provide a Regex.';
-	}
-
-	var index = this.replyDetectors.findIndex(function(el) {
-		return (el.toString() === regex.toString());
-	});
-
-	if (index > -1) this.replyDetectors.splice(index, 1);
-};
-
-MailShine.prototype.removeMany = function(list) {
-	var self = this;
-
-	list.forEach(function(regex) {
-		self.remove(regex);
-	});
-};
-
-MailShine.prototype.replyDetectors = patterns;
 
 module.exports = MailShine;
